@@ -1,5 +1,4 @@
-#Jobify | India Tech Career Portal
-
+🚀 Jobify | India Tech Career Portal
 Jobify is a sleek, high-performance job listing platform built to showcase premium tech opportunities across India. This project features a curated database of 20 high-growth roles from top companies like Zomato, Swiggy, and TCS.
 ✨ Key Features
 Localized for India: All job salaries are displayed in the Lakh/yr format to match Indian industry standards.
