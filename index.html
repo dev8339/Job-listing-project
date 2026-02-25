@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobify | India Tech Careers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .modal-active { display: flex !important; }
+        .brand-gradient {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-blob {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(37,99,235,0.06) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+        }
+        .job-card:hover { transform: translateY(-8px); border-color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-[#fcfdff] min-h-screen text-slate-900">
+
+    <nav class="bg-white/90 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <img src="logo.png" alt="Jobify Logo" class="h-12 w-12 object-contain">
+                <span class="text-2xl font-extrabold tracking-tighter brand-gradient uppercase">Jobify</span>
+            </div>
+            <div class="text-sm font-bold bg-blue-50 px-4 py-2 rounded-full text-blue-600">
+                <span id="job-count">0</span> Opportunities Live
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative pt-16 pb-24 px-6 text-center overflow-hidden">
+        <div class="hero-blob -top-24 -left-24"></div>
+        <div class="hero-blob -bottom-24 -right-24 rotate-180"></div>
+        
+        <div class="max-w-3xl mx-auto relative z-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight tracking-tight">
+                Unlock Your <span class="brand-gradient">Career Potential</span>
+            </h1>
+            <p class="text-slate-500 text-lg font-medium">Find your dream role in India's top tech companies.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 -mt-16">
+        <div class="bg-white p-6 rounded-[2rem] shadow-2xl shadow-slate-200/40 border border-slate-50 mb-12 relative z-20">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <input type="text" id="search" placeholder="Search Role..." class="border p-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition" oninput="runFilters()">
+                
+                <select id="level" class="border p-4 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" onchange="runFilters()">
+                    <option value="">Experience</option>
+                    <option value="Fresher">Fresher</option>
+                    <option value="Mid-Level">Mid-Level</option>
+                    <option value="Senior">Senior</option>
+                </select>
+
+                <select id="category" class="border p-4 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" onchange="runFilters()">
+                    <option value="">Domain</option>
+                    <option value="Development">Development</option>
+                    <option value="Design">Design</option>
+                    <option value="Data Science">Data</option>
+                    <option value="Cloud">Cloud</option>
+                </select>
+
+                <select id="location" class="border p-4 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-sm" onchange="runFilters()">
+                    <option value="">Location</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Delhi NCR">Delhi NCR</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Odisha">Odisha</option>
+                </select>
+
+                <button onclick="resetFilters()" class="bg-slate-900 text-white p-4 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg">Reset</button>
+            </div>
+        </div>
+
+        <div id="jobList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <div id="jobModal" class="hidden fixed inset-0 bg-slate-900/60 z-[100] items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] max-w-xl w-full p-8 relative shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-6 right-8 text-slate-300 hover:text-slate-900 text-4xl font-light">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const jobs = [
+            { id: 1, title: "SDE-1 (Frontend)", company: "Zomato", level: "Fresher", cat: "Development", loc: "Delhi NCR", salary: "12-18 Lakh/yr", desc: "Work on highly scalable food delivery interfaces." },
+            { id: 2, title: "Product Designer", company: "Razorpay", level: "Mid-Level", cat: "Design", loc: "Bangalore", salary: "22-35 Lakh/yr", desc: "Crafting the future of fintech payments in India." },
+            { id: 3, title: "Data Analyst", company: "Swiggy", level: "Fresher", cat: "Data Science", loc: "Bangalore", salary: "10-14 Lakh/yr", desc: "Drive logistics optimization using real-time data." },
+            { id: 4, title: "Cloud Engineer", company: "TCS", level: "Mid-Level", cat: "Cloud", loc: "Mumbai", salary: "15-22 Lakh/yr", desc: "Manage hybrid cloud infrastructures for global clients." },
+            { id: 5, title: "iOS Developer", company: "Cred", level: "Senior", cat: "Development", loc: "Bangalore", salary: "45-60 Lakh/yr", desc: "Build ultra-smooth financial experiences for premium users." },
+            { id: 6, title: "UI/UX Designer", company: "Paytm", level: "Fresher", cat: "Design", loc: "Delhi NCR", salary: "8-12 Lakh/yr", desc: "Design wallet and payment flows for millions of users." },
+            { id: 7, title: "Backend Developer", company: "Flipkart", level: "Mid-Level", cat: "Development", loc: "Bangalore", salary: "25-40 Lakh/yr", desc: "Optimize large-scale e-commerce backend systems." },
+            { id: 8, title: "Security Specialist", company: "Infosys", level: "Senior", cat: "Development", loc: "Pune", salary: "30-45 Lakh/yr", desc: "Ensure enterprise-grade security for banking clients." },
+            { id: 9, title: "Machine Learning Eng", company: "Ola Electric", level: "Mid-Level", cat: "Data Science", loc: "Bangalore", salary: "28-42 Lakh/yr", desc: "Develop AI for autonomous vehicle systems." },
+            { id: 10, title: "DevOps Engineer", company: "HCL Tech", level: "Mid-Level", cat: "Cloud", loc: "Hyderabad", salary: "18-26 Lakh/yr", desc: "Automation and CI/CD for healthcare platforms." },
+            { id: 11, title: "React Developer", company: "Jio", level: "Fresher", cat: "Development", loc: "Mumbai", salary: "9-15 Lakh/yr", desc: "Build next-gen entertainment apps for the 5G era." },
+            { id: 12, title: "Product Manager", company: "PhonePe", level: "Mid-Level", cat: "Design", loc: "Bangalore", salary: "30-50 Lakh/yr", desc: "Lead payment product roadmaps for the Indian market." },
+            { id: 13, title: "Full Stack Engineer", company: "Nykaa", level: "Senior", cat: "Development", loc: "Mumbai", salary: "40-55 Lakh/yr", desc: "Scale the web engine for India's leading beauty platform." },
+            { id: 14, title: "Systems Architect", company: "Wipro", level: "Senior", cat: "Cloud", loc: "Hyderabad", salary: "35-50 Lakh/yr", desc: "Architecting enterprise digital transformations." },
+            { id: 15, title: "Graphic Designer", company: "Boat", level: "Fresher", cat: "Design", loc: "Delhi NCR", salary: "6-10 Lakh/yr", desc: "Create viral social media and brand identity assets." },
+            { id: 16, title: "Web Developer", company: "Freshworks", level: "Fresher", cat: "Development", loc: "Odisha", salary: "10-15 Lakh/yr", desc: "Build world-class SaaS tools for global businesses." },
+            { id: 17, title: "Java Developer", company: "Tech Mahindra", level: "Mid-Level", cat: "Development", loc: "Pune", salary: "14-20 Lakh/yr", desc: "Develop banking microservices for international banks." },
+            { id: 18, title: "Big Data Engineer", company: "Mindtree", level: "Mid-Level", cat: "Data Science", loc: "Hyderabad", salary: "20-30 Lakh/yr", desc: "Processing petabytes of data for smart-city projects." },
+            { id: 19, title: "Solutions Architect", company: "LTI Mindtree", level: "Senior", cat: "Cloud", loc: "Mumbai", salary: "40-65 Lakh/yr", desc: "Designing complex cloud ecosystems for global clients." },
+            { id: 20, title: "Blockchain Dev", company: "Polygon", level: "Mid-Level", cat: "Development", loc: "Odisha", salary: "30-50 Lakh/yr", desc: "Scaling Ethereum for the next billion users." }
+        ];
+
+        function runFilters() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const level = document.getElementById('level').value;
+            const category = document.getElementById('category').value;
+            const location = document.getElementById('location').value;
+
+            const filtered = jobs.filter(job => 
+                (job.title.toLowerCase().includes(query) || job.company.toLowerCase().includes(query)) &&
+                (level === "" || job.level === level) &&
+                (category === "" || job.cat === category) &&
+                (location === "" || job.loc === location)
+            );
+            renderJobs(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = "";
+            document.getElementById('level').value = "";
+            document.getElementById('category').value = "";
+            document.getElementById('location').value = "";
+            renderJobs(jobs);
+        }
+
+        function renderJobs(data) {
+            const list = document.getElementById('jobList');
+            document.getElementById('job-count').innerText = data.length;
+            list.innerHTML = data.length === 0 ? `<div class="col-span-full text-center py-20 text-slate-400 font-bold">Try adjusting filters for Indian cities.</div>` : "";
+            
+            data.forEach(job => {
+                list.innerHTML += `
+                    <div class="job-card bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm transition-all duration-300 group">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-blue-50 text-blue-600 text-[9px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest">${job.cat}</span>
+                            <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">📍 ${job.loc}</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900 mb-1 leading-tight group-hover:text-blue-600 transition tracking-tight">${job.title}</h2>
+                        <p class="text-slate-500 text-xs font-semibold mb-6">${job.company} • ${job.level}</p>
+                        
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-50">
+                            <div>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase mb-0.5">Annual Package</p>
+                                <span class="text-lg font-extrabold text-slate-900 tracking-tighter">${job.salary}</span>
+                            </div>
+                            <button onclick="openModal(${job.id})" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-900 transition-all shadow-md shadow-blue-100">DETAILS</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function openModal(id) {
+            const job = jobs.find(j => j.id === id);
+            document.getElementById('modalContent').innerHTML = `
+                <div class="mb-6">
+                    <span class="text-blue-600 text-xs font-extrabold uppercase tracking-widest mb-2 block">Apply to ${job.company}</span>
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-1 leading-tight tracking-tighter">${job.title}</h2>
+                    <p class="text-slate-500 font-bold text-md">${job.loc} — ${job.level}</p>
+                </div>
+                
+                <div class="bg-slate-50 p-5 rounded-2xl mb-6">
+                    <p class="text-slate-600 text-sm leading-relaxed">${job.desc}</p>
+                </div>
+                
+                <form onsubmit="event.preventDefault(); alert('Application sent to ${job.company} HR! Good luck.'); closeModal();" class="space-y-4">
+                    <input type="email" placeholder="Your work email" required class="w-full border-slate-200 border p-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-white font-medium">
+                    <button type="submit" class="w-full bg-slate-900 text-white font-extrabold py-4 rounded-xl hover:bg-blue-600 shadow-xl transition-all">Submit Application</button>
+                </form>
+            `;
+            document.getElementById('jobModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('jobModal').style.display = 'none'; }
+        renderJobs(jobs);
+    </script>
+</body>
+</html>
